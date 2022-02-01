@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Callable
+from typing import Callable, Tuple
 
 
 class Menu:
@@ -15,13 +15,18 @@ class Menu:
 
         self.__parent = parent
 
-    def add_item(self, desc: str, callback: Callable):
+    def add_item(self, desc: str, callback: Callable, argv: Tuple = None):
         """Add item to menu
 
         desc -- text to show\n
         callback -- function to call on choice
         """
-        self.items.append({"desc": desc, "callback": callback})
+        if argv is None:
+            argv = ()
+        self.items.append({"desc": desc, "callback": callback, "argv": argv})
+
+    def add_exit(self, desc: str = "exit"):
+        self.items.append({"desc": desc, "callback": exit, "argv": (0,)})
 
     def add_submenu(self, desc: str, start_at_one=None, allow_back=True) -> Menu:
         """Add submenu as item
@@ -44,7 +49,7 @@ class Menu:
         for idx, item in enumerate(self.items):
             print(f"{idx+self.start_at_one}{self.separator} {item.get('desc')}")
 
-    def run(self):
+    def run(self, repeat: bool = False):
         if self.__parent is not None:
             self.add_item("back", self.__parent.run)
 
@@ -60,4 +65,9 @@ class Menu:
                 break
             print("Not an option")
 
-        self.items[choice].get("callback")()
+        fun = self.items[choice].get("callback")
+        arg = self.items[choice].get("argv")
+        fun(*arg)
+
+        if repeat:
+            self.run(repeat)

@@ -1,22 +1,21 @@
 from menu import Menu
 
 
-def hello_world():
-    print("Hello World!")
+class Player:
+    def __init__(self):
+        self.hp = 10
+
+    def take_dmg(self, v):
+        self.hp -= v
+
+    def show_hp(self):
+        print(self.hp)
 
 
-def foo():
-    print("foo")
-
-
-def bar():
-    print("bar")
-
+player = Player()
 
 menu = Menu(True)
-menu.add_item("Hello", hello_world)
-submenu = menu.add_submenu("More", allow_back=False)
-submenu.add_item("foo", foo)
-submenu.add_item("bar", bar)
-
-menu.run()
+menu.add_item("damage", player.take_dmg, (3,))
+menu.add_item("show", player.show_hp)
+menu.add_exit()
+menu.run(True)
